@@ -96,7 +96,10 @@ app.get('/login', function(req, res, next) {
 //google login endpoint
 app.get('/auth/google', 
 	passport.authenticate('google', {
-		scope: ['https://www.googleapis.com/auth/plus.login']
+		scope: [
+			'https://www.googleapis.com/auth/plus.login',
+			'https://www.googleapis.com/auth/userinfo.email',
+		]
 	}
 ));
 

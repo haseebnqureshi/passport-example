@@ -2,14 +2,18 @@ html
 	head
 		title googleapis-passport
 	body
+		h2 Login
 		p= message
-		form(action="/login", method="POST")
+		form(action="/auth/local", method="POST")
 			div
-				label Username:
-				input(type="text", name="username")
+				label Email:
+				input(type="email", name="email")
 			div
 				label Password:
 				input(type="password", name="password")
 			div
 				input(type="submit", value="Log In")
-		a(href="/auth/google") Sign in with Google
+		div
+			a(href="/auth/google") Sign in with Google
+		div
+			a(href="/register") Don't have an account? Register

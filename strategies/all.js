@@ -17,8 +17,8 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
-//loading test user info for purposes of example
-var testUser = { id: 12198, firstName: 'John', lastName: 'Doe', username: 'john@doe.com', password: '1234567890' };
+//loading any necessary data modeling
+var Users = require(path.resolve(__dirname, '../models/users.js'));
 
 //express configuration
 app.set('view engine', 'pug');
@@ -34,32 +34,42 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
+//
+var paths = {
+	login: '/login',
+	register: '/register',
+	app: '/app',
+	logout: '/logout'
+};
+
+
 
 /* START PASSPORT */ 
 
 //taking our user, and returning its identifying id
 passport.serializeUser(function(user, done) {
-	done(null, testUser.id);
+	done(null, user.id);
 });
 
 //taking our found user id, returning found user
 passport.deserializeUser(function(id, done) {
-	done(null, testUser);
+	var user = Users.findById(id);
+	done(null, user);
 });
 
 //configuring local strategy
 passport.use(new LocalStrategy({
+	usernameField: 'email',
+	passwordField: 'password',
 	passReqToCallback: true
-}, function(req, username, password, done) {
+}, function(req, email, password, done) {
 	if (!req.user) {
 		console.log('no pre-existing account to associate...');
-		if (username !== testUser.username) { 
-			return done(null, false, { message: 'Incorrect username' });
+		var user = Users.findByEmailAndPassword(email, password);
+		if (!user) {
+			return done(null, false, { message: 'Email and/or password did not match.' });
 		}
-		if (password !== testUser.password) {
-			return done (null, false, { message: 'Incorrect password' });
-		}
-		return done(null, testUser);
+		return done(null, user);
 	}
 	else {
 		console.log('need to associate accounts...');
@@ -67,13 +77,6 @@ passport.use(new LocalStrategy({
 		return done(null, req.user);
 	}
 }));
-
-//login endpoint for front-end form
-app.post('/login', passport.authenticate('local', {
-	successRedirect: '/app',
-	failureRedirect: '/login',
-	failureFlash: true
-}))
 
 //configuring google strategy
 passport.use(new GoogleStrategy({
@@ -109,41 +112,80 @@ var isAuthenticated = function(req, res, next) {
 	if (req.isAuthenticated()) {
 		return next();
 	}
-	res.redirect('/login');
+	res.redirect(paths.login);
 };
 
 //restricted area
-app.get('/app', isAuthenticated, function(req, res, next) {
+app.get(paths.app, isAuthenticated, function(req, res, next) {
 	res.render('app');
 });
 
 //login screen
-app.get('/login', function(req, res, next) {
-	res.render('login', { message: req.flash('error') });
+app.get(paths.login, function(req, res, next) {
+	if (req.isAuthenticated()) {
+		res.redirect(paths.app);
+	}
+	var email = req.flash('email')[0] || '';
+	res.render('login', { email, message: req.flash('error') });
 });
 
 //logout endpoint
-app.get('/logout', function(req, res) {
+app.get(paths.logout, function(req, res) {
 	req.logout();
-	res.redirect('/login');
+	res.redirect(paths.login);
 });
 
 //google login endpoint
+//https://developers.google.com/identity/protocols/googlescopes
 app.get('/auth/google', 
 	passport.authenticate('google', {
-		scope: ['https://www.googleapis.com/auth/plus.login']
+		scope: [
+			'https://www.googleapis.com/auth/plus.login',
+			'https://www.googleapis.com/auth/userinfo.email'
+		]
 	}
 ));
 
 //google callback endpoint, after google generates our access token
 app.get('/auth/google/callback', 
 	passport.authenticate('google', {
-		failureRedirect: '/login'
+		failureRedirect: paths.login
 	}),
 	function(req, res, next) {
-		res.redirect('/app')
+		res.redirect(paths.app)
 	}
 );
+
+//login endpoint for front-end form
+app.post('/auth/local', passport.authenticate('local', {
+	successRedirect: paths.app,
+	failureRedirect: paths.login,
+	failureFlash: true
+}));
+
+
+app.get(paths.register, function(req, res, next) {
+	var email = req.flash('email')[0] || '';
+	res.render('register', { email, message: req.flash('error') });
+});
+
+app.post(paths.register, function(req, res, next) {
+	if (req.body.password !== req.body.password_confirm) {
+		req.flash('error', 'Passwords did not match. Please try again.');
+		req.flash('email', req.body.email);
+		return res.redirect(paths.register);
+	}
+
+	var user = Users.create(req.body.email, req.body.password);
+
+	req.login(user, function(err) {
+		if (err) { 
+			req.flash('error', err);
+			return res.redirect(paths.login);
+		}
+		return res.redirect(paths.app);
+	});
+});
 
 //start express server
 app.listen(process.env.PORT, function() {
