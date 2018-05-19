@@ -235,5 +235,5 @@ app.post(paths.register, function(req, res, next) {
 app.listen(process.env.PORT, function() {
 
 	//and open our login screen
-	opn(`http://localhost:${process.env.PORT}/login`);
+	opn(`http://localhost:${process.env.PORT}${paths.login}`);
 });
