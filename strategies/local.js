@@ -6,6 +6,7 @@ require('dotenv').config();
 //dependencies
 var express = require('express');
 var app = express();
+var path = require('path');
 var opn = require('opn');
 var session = require('express-session');
 var flash = require('connect-flash');
@@ -20,8 +21,8 @@ var testUser = { id: 12198, firstName: 'John', lastName: 'Doe', username: 'john@
 
 //express configuration
 app.set('view engine', 'pug');
-app.set('views', __dirname + '/views');
-app.use(express.static(__dirname + '/public'));
+app.set('views', path.resolve(__dirname, '../views'));
+app.use(express.static(path.resolve(__dirname, '../public')));
 app.use(session({ 
 	secret: 'dog',
 	resave: false,
