@@ -83,7 +83,7 @@ app.get('/app', isAuthenticated, function(req, res, next) {
 
 //login screen
 app.get('/login', function(req, res, next) {
-	res.render('login', { message: req.flash('error') });
+	res.render('login-local', { message: req.flash('error') });
 });
 
 //logout endpoint
