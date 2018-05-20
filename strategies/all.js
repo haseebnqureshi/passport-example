@@ -21,6 +21,7 @@ require('dotenv').config();
 var express = require('express');
 var app = express();
 var path = require('path');
+var _ = require('underscore');
 var opn = require('opn');
 var session = require('express-session');
 var flash = require('connect-flash');
@@ -111,12 +112,21 @@ passport.use(new GoogleStrategy({
 }, function(req, accessToken, refreshToken, profile, done) {
 	if (!req.user) {
 		console.log('no pre-existing account to associate...');
+		req.user = _.omit(profile, 'id');
+		req.user.google_id = profile.id;
 	}
 	else {
-		console.log('need to associate accounts...');		
+		console.log('need to associate accounts...');	
+		req.user.google_id = profile.id;
 	}
-	console.log({ profile });
-	return done(null, profile);
+
+	Users.save(req.user);
+
+	req.login(req.user, function(err) {
+		if (err) { return done(err); }
+		return done(null, req.user);
+	});
+
 }));
 
 
@@ -125,7 +135,9 @@ passport.use(new GoogleStrategy({
 //======================================================================
 
 var isAuthenticated = function(req, res, next) {
-	if (req.isAuthenticated()) {
+	var isAuthenticated = req.isAuthenticated();
+	console.log({ isAuthenticated });
+	if (isAuthenticated) {
 		return next();
 	}
 	res.redirect(paths.login);
@@ -160,11 +172,10 @@ app.get('/auth/google',
 //receives google's access token after account verification
 app.get('/auth/google/callback', 
 	passport.authenticate('google', {
-		failureRedirect: paths.login
-	}),
-	function(req, res, next) {
-		res.redirect(paths.app)
-	}
+		successRedirect: paths.app,
+		failureRedirect: paths.login,
+		failureFlash: true
+	})
 );
 
 

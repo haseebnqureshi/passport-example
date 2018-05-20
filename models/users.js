@@ -9,16 +9,23 @@ var hashPassword = module.exports.hashPassword = function(password) {
 };
 
 module.exports.findById = function(id) {
-	return users.findWhere({ id });
+	var user = users.findWhere({ id });
+	return _.isEmpty(user) ? null : user;
 };
 
 module.exports.findByEmailAndPassword = function(email, password) {
 	var password = hashPassword(password);
-	return users.findWhere({ email, password });
+	var user = users.findWhere({ email, password });
+	return _.isEmpty(user) ? null : user;
 };
 
 module.exports.create = function(email, password, options) {
 	var password = hashPassword(password);
 	users.create({ email, password });
-	return users.findWhere({ email, password });
+	var user = users.findWhere({ email, password });
+	return _.isEmpty(user) ? null : user;
+};
+
+module.exports.save = function(user) {
+	users.saveItem(user);
 };
