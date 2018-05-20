@@ -120,6 +120,7 @@ passport.use(new GoogleStrategy({
 		req.user.familyName = profile.name.familyName;
 		req.user.givenName = profile.name.givenName;
 		req.user.google_id = profile.id;
+		req.user.google = profile._json;
 		req.user.email = profile.emails[0].value;
 		req.user.photo = profile.photos[0].value;
 		Users.create(req.user.email, false, req.user);
@@ -127,6 +128,7 @@ passport.use(new GoogleStrategy({
 	else {
 		console.log('need to associate accounts...');	
 		req.user.google_id = profile.id;
+		req.user.google = profile._json;
 		Users.updateById(req.user.id, { google_id: profile.id });
 	}
 	req.login(req.user, function(err) {
