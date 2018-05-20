@@ -224,7 +224,7 @@ app.get(paths.detachGoogle, isAuthenticated, function(req, res, next) {
 	}
 	else {
 		req.flash('error', 'Your Google account has now been successfully disconnected.');
-		Users.nullifyById(req.user.id, 'google_id');
+		Users.updateById(req.user.id, { google: null, google_id: null });
 	}
 	return res.redirect(req.get('Referer'));
 });
