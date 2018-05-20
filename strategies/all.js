@@ -57,7 +57,11 @@ var paths = {
 	login: '/login',
 	register: '/register',
 	app: '/app',
-	logout: '/logout'
+	logout: '/logout',
+	account: '/account',
+	authGoogle: '/auth/google',
+	authLocal: '/auth/local',
+	detachGoogle: '/detach/google'
 };
 
 
@@ -116,19 +120,19 @@ passport.use(new GoogleStrategy({
 		req.user.familyName = profile.name.familyName;
 		req.user.givenName = profile.name.givenName;
 		req.user.google_id = profile.id;
+		req.user.email = profile.emails[0].value;
+		req.user.photo = profile.photos[0].value;
+		Users.create(req.user.email, false, req.user);
 	}
 	else {
 		console.log('need to associate accounts...');	
 		req.user.google_id = profile.id;
+		Users.updateById(req.user.id, { google_id: profile.id });
 	}
-
-	Users.save(req.user);
-
 	req.login(req.user, function(err) {
 		if (err) { return done(err); }
 		return done(null, req.user);
 	});
-
 }));
 
 
@@ -140,6 +144,7 @@ var isAuthenticated = function(req, res, next) {
 	var isAuthenticated = req.isAuthenticated();
 	console.log({ isAuthenticated });
 	if (isAuthenticated) {
+		console.log({ user: req.user });
 		return next();
 	}
 	res.redirect(paths.login);
@@ -147,14 +152,39 @@ var isAuthenticated = function(req, res, next) {
 
 
 //======================================================================
+// PROFILE MIDDLEWARE --------------------------------------------------
+//======================================================================
+
+//make a clean copy of user for various front-end uses
+app.use(function(req, res, next) {
+	if (!req.user) { return next(); }
+	req.profile = _.pick(req.user, 'displayName', 'email', 'photo', 'givenName', 'familyName', 'gender');
+	next();
+});
+
+
+//======================================================================
 // APP -----------------------------------------------------------------
 //======================================================================
 
 app.get(paths.app, isAuthenticated, function(req, res, next) {
-	console.log(req.user);
-	res.render('app', { user: req.user });
+	res.render('app', { paths, user: req.user, message: req.flash('error') });
 });
 
+
+//======================================================================
+// ACCOUNT -------------------------------------------------------------
+//======================================================================
+
+app.get(paths.account, isAuthenticated, function(req, res, next) {
+	res.render('account', { paths, user: req.user, profile: req.profile, message: req.flash('error') });
+});
+
+app.post(paths.account, isAuthenticated, function(req, res, next) {
+	Users.updateById(req.user.id, req.body);
+	req.flash('error', 'Profile has been saved');
+	res.redirect(paths.account);
+});
 
 //======================================================================
 // GOOGLE AUTH ---------------------------------------------------------
@@ -163,7 +193,7 @@ app.get(paths.app, isAuthenticated, function(req, res, next) {
 //======================================================================
 
 //makes originating request to google for account verification
-app.get('/auth/google', 
+app.get(paths.authGoogle, 
 	passport.authenticate('google', {
 		scope: [
 			'https://www.googleapis.com/auth/plus.login',
@@ -173,7 +203,7 @@ app.get('/auth/google',
 ));
 
 //receives google's access token after account verification
-app.get('/auth/google/callback', 
+app.get(`${paths.authGoogle}/callback`, 
 	passport.authenticate('google', {
 		successRedirect: paths.app,
 		failureRedirect: paths.login,
@@ -183,10 +213,26 @@ app.get('/auth/google/callback',
 
 
 //======================================================================
+// DISCONNECT GOOGLE AUTH ----------------------------------------------
+//======================================================================
+
+app.get(paths.detachGoogle, isAuthenticated, function(req, res, next) {
+	if (!req.user.google_id) {
+		req.flash('error', 'You have no connected Google accounts.');
+	}
+	else {
+		req.flash('error', 'Your Google account has now been successfully disconnected.');
+		Users.nullifyById(req.user.id, 'google_id');
+	}
+	return res.redirect(req.get('Referer'));
+});
+
+
+//======================================================================
 // LOCAL AUTH ----------------------------------------------------------
 //======================================================================
 
-app.post('/auth/local', passport.authenticate('local', {
+app.post(paths.authLocal, passport.authenticate('local', {
 	successRedirect: paths.app,
 	failureRedirect: paths.login,
 	failureFlash: true
@@ -202,7 +248,7 @@ app.get(paths.login, function(req, res, next) {
 		res.redirect(paths.app);
 	}
 	var email = req.flash('email')[0] || '';
-	res.render('login', { email, message: req.flash('error') });
+	res.render('login', { paths, email, message: req.flash('error') });
 });
 
 app.get(paths.logout, function(req, res) {
@@ -217,7 +263,7 @@ app.get(paths.logout, function(req, res) {
 
 app.get(paths.register, function(req, res, next) {
 	var email = req.flash('email')[0] || '';
-	res.render('register', { email, message: req.flash('error') });
+	res.render('register', { paths, email, message: req.flash('error') });
 });
 
 app.post(paths.register, function(req, res, next) {

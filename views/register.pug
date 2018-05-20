@@ -1,10 +1,10 @@
 html
 	head
-		title App
+		title haseebnqureshi/passport-example
 	body
 		h2 Register
 		p= message
-		form(action="/register", method="POST")
+		form(action= paths.register, method="POST")
 			div
 				label Email:
 				input(type="email", name="email", value= email, required)
@@ -17,6 +17,6 @@ html
 			div
 				input(type="submit", value="Register")
 		div
-			a(href="/auth/google") Register with Google
+			a(href= paths.authGoogle) Register with Google
 		div
-			a(href="/login") Or have an account? Login
+			a(href= paths.login) Or have an account? Login

@@ -1,10 +1,10 @@
 html
 	head
-		title googleapis-passport
+		title haseebnqureshi/passport-example
 	body
 		h2 Login
 		p= message
-		form(action="/auth/local", method="POST")
+		form(action= paths.authLocal, method="POST")
 			div
 				label Email:
 				input(type="email", name="email")
@@ -14,6 +14,6 @@ html
 			div
 				input(type="submit", value="Log In")
 		div
-			a(href="/auth/google") Login with Google
+			a(href= paths.authGoogle) Login with Google
 		div
-			a(href="/register") Don't have an account? Register
+			a(href= paths.register) Don't have an account? Register

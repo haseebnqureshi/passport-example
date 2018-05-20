@@ -1,6 +1,13 @@
 html
 	head
-		title googleapis-passport
+		title haseebnqureshi/passport-example
 	body
 		h2 App
-		a(href="/logout") Logout
+		div
+			a(href= paths.account) Manage Account
+
+		if !user.google_id
+			div
+				a(href= paths.authGoogle) Connect your Google account
+		div
+			a(href= paths.logout) Logout

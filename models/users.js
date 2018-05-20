@@ -20,12 +20,25 @@ module.exports.findByEmailAndPassword = function(email, password) {
 };
 
 module.exports.create = function(email, password, options) {
-	var password = hashPassword(password);
-	users.create({ email, password });
+	var args = options || {};
+	args.password = password ? hashPassword(password) : false;
+	args.email = email;
+
+	users.create(args);
 	var user = users.findWhere({ email, password });
 	return _.isEmpty(user) ? null : user;
 };
 
 module.exports.save = function(user) {
 	users.saveItem(user);
+};
+
+module.exports.nullifyById = function(id, key) {
+	var values = {};
+	values[key] = null;
+	users.updateWhere({ id }, values);
+};
+
+module.exports.updateById = function(id, values) {
+	users.updateWhere({ id }, values);
 };

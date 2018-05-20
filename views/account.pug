@@ -1,0 +1,27 @@
+html
+	head
+		title haseebnqureshi/passport-example
+	body
+		h2 Account
+		div
+			a(href= paths.app) Back
+
+		p= message
+		form(action= paths.account, method="POST")
+
+			each value, key in profile
+				div
+					label= key
+					input(type="text", name= key, value= value)
+
+			input(type="submit", value="Update Profile")
+
+
+		if !user.google_id
+			div
+				a(href= paths.authGoogle) Connect your Google account
+		else
+			div
+				a(href= paths.detachGoogle) Disconnect your Google account
+		div
+			a(href= paths.logout) Logout
