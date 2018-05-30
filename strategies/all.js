@@ -27,6 +27,7 @@ var session = require('express-session');
 var flash = require('connect-flash');
 var bodyParser = require('body-parser');
 var passport = require('passport');
+var google = require('googleapis').google;
 
 //loading strategies for passport auth
 var LocalStrategy = require('passport-local').Strategy;
@@ -121,6 +122,7 @@ passport.use(new GoogleStrategy({
 		req.user.givenName = profile.name.givenName;
 		req.user.google_id = profile.id;
 		req.user.google = profile._json;
+		req.user.google_token = accessToken;
 		req.user.email = profile.emails[0].value;
 		req.user.photo = profile.photos[0].value;
 		Users.create(req.user.email, false, req.user);
@@ -129,6 +131,7 @@ passport.use(new GoogleStrategy({
 		console.log('need to associate accounts...');	
 		req.user.google_id = profile.id;
 		req.user.google = profile._json;
+		req.user.google_token = accessToken;
 		Users.updateById(req.user.id, { google_id: profile.id });
 	}
 	req.login(req.user, function(err) {
@@ -136,6 +139,57 @@ passport.use(new GoogleStrategy({
 		return done(null, req.user);
 	});
 }));
+
+
+//======================================================================
+// GMAIL MIDDLEWARE ----------------------------------------------------
+//======================================================================
+
+var gmailIntegration = function(req, res, next) {
+	var access_token = req.user.google_token;
+
+	if (!access_token) {
+		return res.redirect(paths.authGoogle);
+	}
+
+	var auth = new google.auth.OAuth2(
+		process.env.GOOGLE_CLIENT_ID,
+		process.env.GOOGLE_CLIENT_SECRET,
+		process.env.GOOGLE_CALLBACK_URL
+	);
+
+	auth.setCredentials({ access_token });
+
+	var gmail = google.gmail({ version: 'v1', auth });
+	//@see https://developers.google.com/gmail/api/v1/reference/
+
+	gmail.users.messages.list({
+		userId: 'me'
+	}, function(err, data) {
+		if (err) {
+			req.flash('error', 'Error with your integration. Please try again later.');
+			return res.redirect(paths.app);
+		}
+
+		var messages = [];
+		_.each(data.data.messages, function(message, index, list) {
+
+			gmail.users.messages.get({
+				userId: 'me',
+				id: message.id
+			}, function(err, data) {
+				if (err) { return; }
+				messages[index] = data.data;
+				console.log(messages.length, messages);
+			});
+
+			if (index == list.length-1) {
+				next();
+			}
+		});
+
+	});
+};
 
 
 //======================================================================
@@ -169,7 +223,7 @@ app.use(function(req, res, next) {
 // APP -----------------------------------------------------------------
 //======================================================================
 
-app.get(paths.app, isAuthenticated, function(req, res, next) {
+app.get(paths.app, isAuthenticated, gmailIntegration, function(req, res, next) {
 	res.render('app', { paths, user: req.user, message: req.flash('error') });
 });
 
@@ -199,7 +253,8 @@ app.get(paths.authGoogle,
 	passport.authenticate('google', {
 		scope: [
 			'https://www.googleapis.com/auth/plus.login',
-			'https://www.googleapis.com/auth/userinfo.email'
+			'https://www.googleapis.com/auth/userinfo.email',
+			'https://www.googleapis.com/auth/gmail.readonly'
 		]
 	}
 ));
