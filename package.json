@@ -4,9 +4,9 @@
   "description": "Simple examples showcasing a few Passport authentication strategies.",
   "main": "index.js",
   "scripts": {
+    "start": "node strategies/all.js",
     "local": "node strategies/local.js",
-    "google": "node strategies/google.js",
-    "all": "node strategies/all.js"
+    "google": "node strategies/google.js"
   },
   "author": "Haseeb Qureshi",
   "license": "MIT",

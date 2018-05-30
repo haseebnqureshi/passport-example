@@ -116,7 +116,7 @@ passport.use(new GoogleStrategy({
 }, function(req, accessToken, refreshToken, profile, done) {
 	if (!req.user) {
 		console.log('no pre-existing account to associate...');
-		req.user = _.omit(profile, 'id', '_raw', '_json', 'name');
+		req.user = _.omit(profile, 'id', '_raw', '_json', 'name', 'emails', 'photos');
 		req.user.familyName = profile.name.familyName;
 		req.user.givenName = profile.name.givenName;
 		req.user.google_id = profile.id;

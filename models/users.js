@@ -21,7 +21,7 @@ module.exports.findByEmailAndPassword = function(email, password) {
 
 module.exports.create = function(email, password, options) {
 	var args = options || {};
-	args.password = password ? hashPassword(password) : false;
+	args.password = password ? hashPassword(password) : '';
 	args.email = email;
 
 	users.create(args);
