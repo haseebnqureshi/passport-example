@@ -1,22 +1,37 @@
 html
-	head
-		title haseebnqureshi/passport-example
+
+	- var title = "Register"
+	include head.pug
+
 	body
-		h2 Register
-		p= message
-		form(action= paths.register, method="POST")
+
+		.uk-container.uk-section
+			h2 Register
+
+			if message.length > 0
+				div(uk-alert).uk-alert-warning
+					a(uk-close).uk-alert-close
+					p= message
+
+			form(action= paths.register, method="POST").uk-form-stacked
+				div.uk-margin-bottom
+					label.uk-form-label Email:
+					.uk-inline
+						span(uk-icon="icon: mail").uk-form-icon.uk-form-icon-flip
+						input(type="email", name="email", value= email, required).uk-input.uk-form-width-medium
+				div.uk-margin-bottom
+					label.uk-form-label Password:
+					.uk-inline
+						span(uk-icon="icon: lock").uk-form-icon.uk-form-icon-flip
+						input(type="password", name="password", required).uk-input.uk-form-width-medium
+				div.uk-margin-bottom
+					label.uk-form-label Confirm Password:
+					.uk-inline
+						span(uk-icon="icon: lock").uk-form-icon.uk-form-icon-flip
+						input(type="password", name="password_confirm", required).uk-input.uk-form-width-medium
+				div
+					input(type="submit", value="Register").uk-input.uk-form-width-medium.uk-button.uk-button-primary
 			div
-				label Email:
-				input(type="email", name="email", value= email, required)
+				a(href= paths.authGoogle) Register with Google
 			div
-				label Password:
-				input(type="password", name="password", required)
-			div
-				label Confirm Password:
-				input(type="password", name="password_confirm", required)
-			div
-				input(type="submit", value="Register")
-		div
-			a(href= paths.authGoogle) Register with Google
-		div
-			a(href= paths.login) Or have an account? Login
+				a(href= paths.login) Or have an account? Login

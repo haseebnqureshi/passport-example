@@ -1,27 +1,35 @@
 html
-	head
-		title haseebnqureshi/passport-example
+
+	- var title = "Account"
+	include head.pug
+
 	body
-		h2 Account
-		div
-			a(href= paths.app) Back
 
-		p= message
-		form(action= paths.account, method="POST")
+		.uk-container.uk-section
+			h2 Account
+			div
+				a(href= paths.app) Back
 
-			each value, key in profile
+			if message.length > 0
+				div(uk-alert).uk-alert-warning
+					a(uk-close).uk-alert-close
+					p= message
+
+			form(action= paths.account, method="POST").uk-form-stacked
+
+				each value, key in profile
+					div.uk-margin-bottom
+						label.uk-form-label= key
+						input(type="text", name= key, value= value).uk-input
+
+				input(type="submit", value="Update Profile").uk-input.uk-form-width-medium.uk-button.uk-button-primary
+
+
+			if !user.google_id
 				div
-					label= key
-					input(type="text", name= key, value= value)
-
-			input(type="submit", value="Update Profile")
-
-
-		if !user.google_id
+					a(href= paths.authGoogle) Connect your Google account
+			else
+				div
+					a(href= paths.detachGoogle) Disconnect your Google account
 			div
-				a(href= paths.authGoogle) Connect your Google account
-		else
-			div
-				a(href= paths.detachGoogle) Disconnect your Google account
-		div
-			a(href= paths.logout) Logout
+				a(href= paths.logout) Logout

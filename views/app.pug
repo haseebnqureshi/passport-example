@@ -1,16 +1,16 @@
 html
-	head
-		title haseebnqureshi/passport-example
+
+	- var title = "App"
+	include head.pug
+
 	body
-		h2 App
-		div
-			a(href= paths.account) Manage Account
-
-		if !user.google_id
+		.uk-container.uk-section
+			h2 App
 			div
-				a(href= paths.authGoogle) Connect your Google account
-		div
+				a(href= paths.account) Manage Account
+			div
+				a(href= paths.logout) Logout
 
-			include google-gmail.pug
-
-			a(href= paths.logout) Logout
+			if !user.google_id
+				div
+					a(href= paths.authGoogle) Connect your Google account

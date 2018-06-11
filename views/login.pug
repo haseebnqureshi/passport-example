@@ -1,19 +1,32 @@
 html
-	head
-		title haseebnqureshi/passport-example
+
+	- var title = "Login"
+	include head.pug
+
 	body
-		h2 Login
-		p= message
-		form(action= paths.authLocal, method="POST")
+
+		.uk-container.uk-section
+			h2 Login
+
+			if message.length > 0
+				div(uk-alert).uk-alert-warning
+					a(uk-close).uk-alert-close
+					p= message
+
+			form(action= paths.authLocal, method="POST").uk-form-stacked
+				div.uk-margin-bottom
+					label.uk-form-label Email:
+					.uk-inline
+						span(uk-icon="icon: mail").uk-form-icon.uk-form-icon-flip
+						input(type="email", name="email").uk-input.uk-form-width-medium
+				div.uk-margin-bottom
+					label.uk-form-label Password:
+					.uk-inline
+						span(uk-icon="icon: lock").uk-form-icon.uk-form-icon-flip
+						input(type="password", name="password").uk-input.uk-form-width-medium
+				div
+					input(type="submit", value="Log In").uk-input.uk-form-width-medium.uk-button.uk-button-primary
 			div
-				label Email:
-				input(type="email", name="email")
+				a(href= paths.authGoogle) Login with Google
 			div
-				label Password:
-				input(type="password", name="password")
-			div
-				input(type="submit", value="Log In")
-		div
-			a(href= paths.authGoogle) Login with Google
-		div
-			a(href= paths.register) Don't have an account? Register
+				a(href= paths.register) Don't have an account? Register
