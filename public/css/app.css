@@ -14,9 +14,24 @@ button {
 }
 
 body {
-	font-size: 12px;
+	font-size: 14px;
 	letter-spacing: -0.01em;
-	color: #333;
+	color: #fff;
+	background: #133344;
+    border: solid 10px #fff;
+}
+
+input {
+    font-size: 14px;
+    letter-spacing: -0.01em;
+    color: #fff;
+    background: none;
+    outline: none;
+    border: none;
+}
+
+.uk-text-muted {
+    font-size: 12px;
 }
 
 h1,
@@ -27,7 +42,7 @@ h5,
 h6 {
 	font-weight: 700;
 	letter-spacing: -0.03em;
-	color: #444;
+	color: #fff;
 }
 
 h1 {
@@ -48,3 +63,158 @@ h6 {
 	letter-spacing: 0.1em;
 	font-size: 0.75rem;
 }
+
+.uk-button {
+    font-weight: 700;
+    padding: 0px;
+    letter-spacing: 1px;
+}
+
+.uk-container-small {
+    max-width: 800px;
+}
+
+.logo {
+	text-transform: uppercase;
+    font-size: 22px;
+    letter-spacing: 1px;
+    display: inline-block;
+    color: #fff;
+    padding-left: 1px;
+    position: relative;
+    font-weight: 700;
+    z-index: 100;
+}
+
+.logo::before {
+	display: block;
+    content: " ";
+    position: absolute;
+    background: #1effd5;
+    width: auto;
+    height: 4px;
+    left: 1px;
+    right: 2px;
+    bottom: -1px;
+}
+
+.logo::after {
+	display: block;
+    content: " ";
+    position: absolute;
+    background: #1effd5;
+    width: 30%;
+    height: 8px;
+    right: 2px;
+    bottom: -5px;
+}
+
+.logo .first {
+	display: inline-block;
+	margin-right: -1px;
+}
+
+.logo sup {
+	font-size: 8px;
+    position: absolute;
+    top: 34px;
+    right: -15px;
+    letter-spacing: -0.5px;
+}
+
+.small-margin * {
+	margin: 10px 0px;
+}
+
+*[uk-sortable] input {
+    background: none;
+    border: none;
+    padding: 0px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    margin-left: 20px;
+    transition: all 0.2s ease;
+}
+
+*[uk-sortable] input:hover {
+    border-bottom: solid 1px rgba(255,255,255,0.2);
+}
+
+*[uk-sortable] input:active,
+*[uk-sortable] input:focus {
+    border-bottom: solid 1px;
+}
+
+
+
+
+
+
+
+/* 
+EDITABLE COMPONENT 
+*/
+
+
+.editable {
+    display: inline-block;
+    margin: 0px 12px;
+}
+
+.editable .value {
+    cursor: text;
+    border-bottom: dashed 1px #fff;
+    line-height: 20px;
+}
+
+.editable input {
+    border-bottom: solid 1px #fff;
+    background: rgba(255,255,255,0.12);
+    font-size: 18px;
+    padding: 2px 5px;
+}
+
+
+/*
+NESTED SORTABLE
+*/
+
+.dd {
+    margin: 20px 0px;
+}
+
+.dd .uk-icon {
+    cursor: move;
+}
+
+.dd-item {
+    line-height: 30px;
+}
+
+.dd-item button[data-action="expand"] {
+    background: rgba(255,255,255,0.4);
+    border: none;
+    text-transform: uppercase;
+    color: #fff;
+    padding: 2px 6px 2px 7px;
+    margin-right: 10px;
+}
+
+.dd-item button[data-action="collapse"] {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    text-transform: uppercase;
+    color: #fff;
+    padding: 2px 6px 2px 7px;
+    margin-right: 10px;
+}
+
+.dd-handle span.uk-icon svg:nth-child(2) {
+    display:none;
+}
+
+
+
+
+

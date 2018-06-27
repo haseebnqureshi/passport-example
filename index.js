@@ -34,7 +34,9 @@ var LocalStrategy = require('passport-local').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 //loading any necessary data modeling
-var Users = require(path.resolve(__dirname, '../models/users.js'));
+var Users = require(path.resolve(__dirname, 'models/users.js'));
+var Lists = require(path.resolve(__dirname, 'models/lists.js'));
+var Items = require(path.resolve(__dirname, 'models/items.js'));
 
 
 //======================================================================
@@ -42,8 +44,8 @@ var Users = require(path.resolve(__dirname, '../models/users.js'));
 //======================================================================
 
 app.set('view engine', 'pug');
-app.set('views', path.resolve(__dirname, '../views'));
-app.use(express.static(path.resolve(__dirname, '../public')));
+app.set('views', path.resolve(__dirname, 'views'));
+app.use(express.static(path.resolve(__dirname, 'public')));
 app.use(session({ 
 	secret: 'dog',
 	resave: false,
@@ -345,6 +347,55 @@ app.post(paths.register, function(req, res, next) {
 	});
 });
 
+
+//======================================================================
+// ITEMS ---------------------------------------------------------------
+//======================================================================
+
+app.get('/lists', function(req, res, next) {
+	res.render('lists', { });
+});
+
+app.post('/lists', function(req, res, next) {
+	var list = Lists.create();
+	return res.redirect(`/l/${list.id}`);
+});
+
+app.get('/l/:id', function(req, res, next) {
+
+	/* TODO: localize any lists to user, either guest or logged in */
+
+	var lists = Lists.findAll();
+	var list = Lists.findById(req.params.id);
+	var items = Items.findAllByListId(req.params.id);
+	res.render('items', { lists, list, items });
+});
+
+app.post('/l/:list_id/i', function(req, res, next) {
+	console.log('called new item', req.body);
+	Items.create(req.params.list_id, req.body);
+	res.status(200).send();
+});
+
+app.get('/l/:list_id/i', function(req, res, next) {
+	var items = Items.findAllByListId(req.params.list_id);
+	var status = items.length > 0 ? 200 : 404;
+	res.status(status).send(items);
+});
+
+app.put('/l/:list_id/i/:id', function(req, res, next) {
+	console.log('updating item', req.body);
+	Items.updateById(req.params.id, req.body);
+	res.status(200).send();
+});
+
+app.delete('/l/:list_id/i/:id', function(req, res, next) {
+	console.log('deleting item', req.body);
+	Items.deleteById(req.params.id);
+	res.status(200).send();
+});
+
+
 //======================================================================
 // RUN SERVER ----------------------------------------------------------
 //======================================================================
@@ -354,3 +405,4 @@ app.listen(process.env.PORT, function() {
 	//and open our login screen
 	opn(`http://localhost:${process.env.PORT}${paths.login}`);
 });
+

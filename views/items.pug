@@ -1,0 +1,40 @@
+html
+
+	- var title = "Items"
+	include head.pug
+
+	body
+
+		.uk-container.uk-section
+
+			div(uk-grid)
+
+				.uk-width-1-4
+					
+					div.small-margin
+						p.uk-text-muted &copy; 2018 Avenue Digital Company, LLC
+
+				.uk-width-3-4
+
+					#items
+
+						p {{serialized}}
+
+						.dd
+							ol.dd-list
+								li(v-for="item in items", v-bind:data-id="item.id").dd-item
+									span.dd-handle
+										span(uk-icon="icon: bolt; ratio: 1")
+									editable(
+										v-model="item.title", 
+										v-on:update:value="update(item.id, 'title', $event)"
+										v-on:update:trash="trash(item.id)"
+									)
+								li
+									editable(
+										v-model="item.title"
+										hide-trash
+									)
+									button(v-on:click="create") Create
+
+
