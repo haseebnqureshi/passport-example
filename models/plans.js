@@ -17,7 +17,8 @@ module.exports.findAll = function() {
 module.exports.create = function() {
 	var id = generate('1234567890qwertyuiopasdfghjklzxcvbnm', 10);
 	var title = 'Your new plan';
-	plans.create({ id, title });
+	var description = 'Something describing this plan.';
+	plans.create({ id, title, description });
 	var plan = plans.findWhere({ id });
 	return _.isEmpty(plan) ? null : plan;
 };

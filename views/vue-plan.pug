@@ -1,0 +1,56 @@
+
+div
+	
+	#plan
+
+		h3 
+			editable(
+				v-model="plan.title", 
+				v-on:update:value="update(plan.id, 'title', $event)",
+				hide-trash
+			)
+
+		p
+			editable(
+				v-model="plan.description"
+				v-on:update:value="update(plan.id, 'description', $event)",
+				hide-trash
+			)
+
+		small {{url}}
+
+
+
+
+	script.
+
+		jQuery(function($) {
+			var plan = new Vue({
+				el: '#plan',
+				data: {
+					plan: {},
+					url: window.location.href
+				},
+				methods: {
+					sync: function() {
+						var that = this;
+						$.get('#{endpoint}', function(plan) {
+							that.plan = plan;
+						});
+					},
+					update: function(id, key, value) {
+						var data = {};
+						data[key] = value;
+						$.ajax({
+							url: '#{endpoint}',
+							data,
+							type: 'put'
+						});
+					},
+				},
+				mounted: function() {
+					var that = this;
+					this.sync();
+				}
+			});
+		});

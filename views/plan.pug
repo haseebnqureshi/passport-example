@@ -5,27 +5,13 @@ html
 
 	body
 
-		p= JSON.stringify(routes);
-
 		.uk-container.uk-section
 
 			div(uk-grid)
 
 				.uk-width-1-3
 
-					#list
-
-						h1 
-							editable(
-								v-model="list.title", 
-								v-on:update:value="update(list.id, 'title', $event)"
-							)
-
-						p planbite.com/p/alskjfi213
-
-						p This is a description, something about this plan.
-
-
+					include vue-plan.pug
 
 				.uk-width-2-3
 
@@ -125,26 +111,6 @@ html
 
 
 
-					#items
-
-						p {{serialized}}
-
-						.dd
-							ol.dd-list
-								li(v-for="item in items", v-bind:data-id="item.id").dd-item
-									span.dd-handle
-										span(uk-icon="icon: bolt; ratio: 1")
-									editable(
-										v-model="item.title", 
-										v-on:update:value="update(item.id, 'title', $event)"
-										v-on:update:trash="trash(item.id)"
-									)
-								li
-									editable(
-										v-model="item.title"
-										hide-trash
-									)
-									button(v-on:click="create") Create
 
 
 
