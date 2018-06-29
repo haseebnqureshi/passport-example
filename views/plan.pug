@@ -1,0 +1,153 @@
+html
+
+	- var title = "Plan"
+	include head.pug
+
+	body
+
+		p= JSON.stringify(routes);
+
+		.uk-container.uk-section
+
+			div(uk-grid)
+
+				.uk-width-1-3
+
+					#list
+
+						h1 
+							editable(
+								v-model="list.title", 
+								v-on:update:value="update(list.id, 'title', $event)"
+							)
+
+						p planbite.com/p/alskjfi213
+
+						p This is a description, something about this plan.
+
+
+
+				.uk-width-2-3
+
+
+
+					.uk-overflow-auto
+						table.uk-table.uk-table-small.uk-table-divider
+							thead
+								tr
+									th 
+									th Task
+									th.uk-table-shrink Hrs.
+									th.uk-table-shrink Est. Hrs.
+									th.uk-table-shrink Progress
+									th
+							tbody
+								tr
+									td.dd-handle
+										span(uk-icon="menu")
+									td This is the first task
+									td.uk-table-shrink 0
+									td.uk-table-shrink 1
+									td.uk-table-shrink 0%
+									td
+								tr
+									td.dd-handle
+										span(uk-icon="menu")
+									td This is the first task
+									td.uk-table-shrink 0
+									td.uk-table-shrink 1
+									td.uk-table-shrink 0%
+									td
+								tr
+									td.dd-handle
+										span(uk-icon="menu")
+									td This is the first task
+									td.uk-table-shrink 0
+									td.uk-table-shrink 1
+									td.uk-table-shrink 0%
+									td
+
+					.uk-overflow-auto.uk-margin
+						table.uk-table.uk-table-small.uk-table-divider
+							thead
+								tr
+									th
+									th Primary Objective
+									th.uk-table-shrink (S)pecific
+									th.uk-table-shrink (M)easurable
+									th.uk-table-shrink (A)ctionable
+									th.uk-table-shrink (R)ealistic
+									th.uk-table-shrink (T)imely
+									th
+							tbody
+								tr
+									td.dd-handle
+										span(uk-icon="menu")
+									td Creating work breakdown structure
+									td.uk-table-shrink 
+										input(type="checkbox").uk-checkbox
+									td.uk-table-shrink 
+										input(type="checkbox").uk-checkbox
+									td.uk-table-shrink 
+										input(type="checkbox").uk-checkbox
+									td.uk-table-shrink 
+										input(type="checkbox").uk-checkbox
+									td.uk-table-shrink 
+										input(type="checkbox").uk-checkbox
+									td
+
+
+					.uk-overflow-auto.uk-margin
+						table.uk-table.uk-table-small.uk-table-divider
+							thead
+								tr
+									th
+									th Collaborator
+									th.uk-table-shrink Email
+									th.uk-table-shrink Status
+									th
+							tbody
+								tr
+									td.dd-handle
+										span(uk-icon="menu")
+									td David Morehous
+									td.uk-table-shrink dmorehous@morehouslegal.com
+									td.uk-table-shrink Invited
+									td
+								tr
+									td.dd-handle
+										span(uk-icon="menu")
+									td Sharon Groer
+									td.uk-table-shrink sgroer@morehouslegal.com
+									td.uk-table-shrink Accepted
+									td
+
+
+
+
+					#items
+
+						p {{serialized}}
+
+						.dd
+							ol.dd-list
+								li(v-for="item in items", v-bind:data-id="item.id").dd-item
+									span.dd-handle
+										span(uk-icon="icon: bolt; ratio: 1")
+									editable(
+										v-model="item.title", 
+										v-on:update:value="update(item.id, 'title', $event)"
+										v-on:update:trash="trash(item.id)"
+									)
+								li
+									editable(
+										v-model="item.title"
+										hide-trash
+									)
+									button(v-on:click="create") Create
+
+
+
+			div.small-margin
+				p.uk-text-muted &copy; 2018 Avenue Digital Company, LLC
+

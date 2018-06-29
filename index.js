@@ -35,8 +35,8 @@ var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 //loading any necessary data modeling
 var Users = require(path.resolve(__dirname, 'models/users.js'));
-var Lists = require(path.resolve(__dirname, 'models/lists.js'));
-var Items = require(path.resolve(__dirname, 'models/items.js'));
+var Plans = require(path.resolve(__dirname, 'models/plans.js'));
+var Tasks = require(path.resolve(__dirname, 'models/tasks.js'));
 
 
 //======================================================================
@@ -349,51 +349,87 @@ app.post(paths.register, function(req, res, next) {
 
 
 //======================================================================
-// ITEMS ---------------------------------------------------------------
+// API -----------------------------------------------------------------
 //======================================================================
 
-app.get('/lists', function(req, res, next) {
-	res.render('lists', { });
-});
+var api = express.Router();
 
-app.post('/lists', function(req, res, next) {
-	var list = Lists.create();
-	return res.redirect(`/l/${list.id}`);
-});
+api.route('/p')
+	.get(function(req, res, next) {
+		var plans = Plans.findAll();
+		res.status(200).send(plans);
+	})
+	.post(function(req, res, next) {
+		var plan = Plans.create();
+		res.status(200).send(plan);
+	});
 
-app.get('/l/:id', function(req, res, next) {
+api.route('/p/:id')
+	.get(function(req, res, next) {
+		var plan = Plans.findById(req.params.id);
+		res.status(200).send(plan);
+	})
+	.put(function(req, res, next) {
+		Plans.updateById(req.params.id, req.body);
+		res.status(200).send();
+	})
+	.delete(function(req, res, next) {
+		Plans.deleteById(req.params.id);
+		res.status(200).send();
+	});
 
-	/* TODO: localize any lists to user, either guest or logged in */
+api.route('/p/:plan_id/t')
+	.get(function(req, res, next) {
+		var tasks = Tasks.findAllByPlanId(req.params.plan_id);
+		res.status(200).send(tasks);
+	})
+	.post(function(req, res, next) {
+		Tasks.create(req.params.plan_id, req.body);
+		res.status(200).send();
+	});
 
-	var lists = Lists.findAll();
-	var list = Lists.findById(req.params.id);
-	var items = Items.findAllByListId(req.params.id);
-	res.render('items', { lists, list, items });
-});
+api.route('/p/:plan_id/t/:id')
+	.get(function(req, res, next) {
+		var task = Tasks.findById(req.params.id);
+		res.status(200).send(task);
+	})
+	.put(function(req, res, next) {
+		Tasks.updateById(req.params.id, req.body);
+		res.status(200).send();
+	})
+	.delete(function(req, res, next) {
+		Tasks.deleteById(req.params.id);
+		res.status(200).send();
+	});
 
-app.post('/l/:list_id/i', function(req, res, next) {
-	console.log('called new item', req.body);
-	Items.create(req.params.list_id, req.body);
-	res.status(200).send();
-});
+app.use('/api', api);
 
-app.get('/l/:list_id/i', function(req, res, next) {
-	var items = Items.findAllByListId(req.params.list_id);
-	var status = items.length > 0 ? 200 : 404;
-	res.status(status).send(items);
-});
 
-app.put('/l/:list_id/i/:id', function(req, res, next) {
-	console.log('updating item', req.body);
-	Items.updateById(req.params.id, req.body);
-	res.status(200).send();
-});
+//======================================================================
+// VIEWS ---------------------------------------------------------------
+//======================================================================
 
-app.delete('/l/:list_id/i/:id', function(req, res, next) {
-	console.log('deleting item', req.body);
-	Items.deleteById(req.params.id);
-	res.status(200).send();
-});
+var views = express.Router();
+
+views.route('/p')
+	.get(function(req, res, next) {
+		var plans = Plans.findAll();
+		res.render('plans', { plans });
+	})
+	.post(function(req, res, next) {
+		var plan = Plans.create();
+		res.redirect(`/p/${plan.id}`);
+	});
+
+views.route('/p/:id')
+	.get(function(req, res, next) {
+		var plan = Plans.findById(req.params.id);
+		var tasks = Tasks.findAllByPlanId(req.params.id);
+		var endpoint = `/api/p/${req.params.id}`;
+		res.render('plan', { plan, tasks, endpoint });
+	});
+
+app.use('/', views);
 
 
 //======================================================================

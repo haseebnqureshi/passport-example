@@ -141,6 +141,42 @@ jQuery(function($) {
 	}
 
 
+	if ($('#list').length > 0) {
+
+		var list = new Vue({
+			el: '#list',
+			data: {
+				list: {}
+			},
+			methods: {
+				sync: function() {
+					var that = this;
+
+					$.get(window.location.href + '/i', function(items) {
+						that.items = items;
+					});
+				},
+				update: function(id, key, value) {
+					if (value === false) {
+						this.delete(id);
+						return;
+					}
+					console.log('updating', id, key, value);
+					var data = {};
+					data[key] = value;
+					$.ajax({
+						url: window.location.href + '/i/' + id,
+						data,
+						type: 'put'
+					});
+				},
+			},
+			mounted: function() {
+				var that = this;
+				this.sync();
+			}
+		});
+	}
 
 
 
