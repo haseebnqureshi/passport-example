@@ -9,7 +9,10 @@ h6,
 input,
 textarea,
 select,
-button { 
+button,
+td,
+th,
+tr { 
 	font-family: 'Montserrat', sans-serif;
 }
 
@@ -32,6 +35,11 @@ input {
 
 .uk-text-muted {
     font-size: 12px;
+}
+
+td,
+th {
+    font-size: 14px;
 }
 
 h1,
